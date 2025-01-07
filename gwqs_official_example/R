@@ -1,0 +1,9 @@
+library(gWQS)
+data(wqs_data)
+toxic_chems <- names(wqs_data)[1:34]
+
+# we run the model and save the results in the variable "results"
+results <- gwqs(y ~ wqs, mix_name = toxic_chems,
+                data = wqs_data, q = 4, validation = 0.6, b = 100,
+                b1_pos = TRUE, b1_constr = FALSE, family = "gaussian",
+                seed = 1, plots = TRUE, tables = TRUE)
