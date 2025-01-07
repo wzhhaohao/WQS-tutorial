@@ -4,7 +4,7 @@ library(splines)
 library(dplyr)
 
 # import data
-data = read.csv("./第二篇/data.csv")
+data = read.csv("./data.csv")
 # str(data)
 # summary(data)
 

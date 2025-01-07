@@ -17,15 +17,15 @@ na.summary = function(data) {
 }
 
 # read data
-DEMO = read_xpts("./第二篇/DEMO/")
-PBCD = read_xpts("./第二篇/PBCD/")
-ALQ = read_xpts("./第二篇/ALQ/")
-BMX = read_xpts("./第二篇/BMX/")
-BPQ = read_xpts("./第二篇/BPQ/")
-DXX = read_xpts("./第二篇/DXX/")
-PAQ = read_xpts("./第二篇/PAQ/")
-SMQ = read_xpts("./第二篇/SMQ/")
-DIQ = read_xpts("./第二篇/DIQ/")
+DEMO = read_xpts("./DEMO/")
+PBCD = read_xpts("./PBCD/")
+ALQ = read_xpts("./ALQ/")
+BMX = read_xpts("./BMX/")
+BPQ = read_xpts("./BPQ/")
+DXX = read_xpts("./DXX/")
+PAQ = read_xpts("./PAQ/")
+SMQ = read_xpts("./SMQ/")
+DIQ = read_xpts("./DIQ/")
 
 # 逐步合并多个数据框
 merged_data <- list(DEMO, PBCD, ALQ, BMX, BPQ, DXX, PAQ, SMQ, DIQ) %>%
