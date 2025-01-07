@@ -40,13 +40,100 @@ interst = c("SEQN", "RIDAGEYR", "RIAGENDR", "DMDEDUC2", "DMDMARTL", "INDFMPIR",
     "ALQ101", "ALQ111", "SMQ020", "PAD680", "DIQ010", "BPQ020", "BMXBMI")
 data = merged_data[, interst]
 
-# 数据预处理
+data.copy = data
 
+# 数据预处理
+# 第一part
 # 筛选年龄18以上的
 n = nrow(data)
 data = data %>% filter(RIDAGEYR >= 18)
 na.summary(data)
 cat("删除了", n - nrow(data), "18岁以下的人数\n")
+
+
+# 处理重金属数据
+n = nrow(data)
+summary(data[, c("LBXBPB", "LBXBCD", "LBXTHG", "LBXBSE", "LBXBMN")])
+data = data %>%
+    mutate(
+        LBXBPB = ifelse(LBXBPB >= 0.25, LBXBPB, NA_real_),
+        LBXBCD = ifelse(LBXBCD >= 0.16, LBXBCD, NA_real_),
+        LBXTHG = ifelse(LBXTHG >= 0.16, LBXTHG, NA_real_),
+        LBXBSE = ifelse(LBXBSE >= 30, LBXBSE, NA_real_),
+        LBXBMN = ifelse(LBXBMN >= 1.06, LBXBMN, NA_real_)
+    ) %>%
+    filter(if_all(c("LBXBPB", "LBXBCD", "LBXTHG", "LBXBSE", "LBXBMN"), ~ !is.na(.x)))
+cat("删除了", n - nrow(data), "行heavy metal缺失数据\n")
+
+# BMI数据处理
+n = nrow(data)
+data = data %>%
+    filter(!is.na(BMXBMI))
+cat("删除了", n - nrow(data), "行BMI缺失数据\n")
+
+# DXA数据处理
+n = nrow(data)
+data = data %>%
+    filter(!is.na(DXDLALE), !is.na(DXDRALE), !is.na(DXDLLLE), !is.na(DXDRLLE))
+cat("删除了", n - nrow(data), "行DXA缺失数据\n")
+
+
+# 处理骨密度数据
+data = data %>%
+    mutate(
+        ASM = (DXDLALE + DXDRALE + DXDLLLE + DXDRLLE) / 1000,
+        ASMI = ASM / BMXBMI,
+        Sarcopenia = ifelse((RIAGENDR == 1 & ASMI < 0.789) | (RIAGENDR == 2 & ASMI < 0.512) , 1, 0)
+    )
+
+
+# 第二part
+# 处理婚姻数据：1是1 5变2 其他变3 missing的排除 DMDMARTL
+table(data$DMDMARTL)
+n = nrow(data)
+data = data %>%
+    mutate(
+        DMDMARTL = case_when(
+        DMDMARTL == 1 ~ 1,
+        DMDMARTL == 5 ~ 2,
+        DMDMARTL %in% c(2, 3, 4, 6) ~ 3,
+        TRUE ~ NA_real_  
+)) %>%
+    filter(!is.na(DMDMARTL))
+table(data$DMDMARTL)
+cat("删除了", n - nrow(data), "行婚姻数据缺失数据\n")
+
+# 处理教育数据：将1和2变为1 将3变为2 将4和5变成3 对于拒绝回答和不知道的以及缺失的排除 DMDEDUC2
+table(data$DMDEDUC2)
+n = nrow(data)
+data = data %>%
+    mutate(
+        DMDEDUC2 = case_when(
+        DMDEDUC2 %in% c(1, 2) ~ 1,
+        DMDEDUC2 == 3 ~ 2,
+        DMDEDUC2 %in% c(4, 5) ~ 3,
+        TRUE ~ NA_real_
+)) %>%
+    filter(!is.na(DMDEDUC2))
+
+table(data$DMDEDUC2)
+cat("删除了", n - nrow(data), "行教育数据缺失数据\n")
+
+# 对重金属数据进行单位统一 并以10为底进行log变换
+data = data %>%
+    mutate(
+        LBXBCD = log10(LBXBCD / 10),
+        LBXTHG = log10(LBXTHG / 10),
+        LBXBSE = log10(LBXBSE / 10),
+        LBXBMN = log10(LBXBMN / 10)
+    )
+
+
+# 处理PIR数据：缺失的排除 INDFMPIR
+n = nrow(data)
+data = data %>%
+    filter(!is.na(INDFMPIR))
+cat("删除了", n - nrow(data), "行PIR缺失数据\n")
 
 
 
@@ -74,56 +161,21 @@ data <- data %>%
     select(-ALQ101, -ALQ111) 
 cat("删除了", n - nrow(data), "行ALQ的缺失数据\n")
 
-
-
-
-
-# 处理教育数据：将1和2变为1 将3变为2 将4和5变成3 对于拒绝回答和不知道的以及缺失的排除 DMDEDUC2
-table(data$DMDEDUC2)
-data = data %>%
-    mutate(
-        DMDEDUC2 = case_when(
-        DMDEDUC2 %in% c(1, 2) ~ 1,
-        DMDEDUC2 == 3 ~ 2,
-        DMDEDUC2 %in% c(4, 5) ~ 3,
-        TRUE ~ NA_real_
-))
-table(data$DMDEDUC2)
-
-# 处理婚姻数据：1是1 5变2 其他变3 missing的排除 DMDMARTL
-table(data$DMDMARTL)
-data = data %>%
-    mutate(
-        DMDMARTL = case_when(
-        DMDMARTL == 1 ~ 1,
-        DMDMARTL == 5 ~ 2,
-        is.na(DMDMARTL) ~ NA_real_,
-        TRUE ~ 3      
-))
-table(data$DMDMARTL)
-
 # 处理吸烟数据
-table(data$SMQ020)
+n = nrow(data)
 data = data %>%
     mutate(
         SMQ020 = case_when(
         SMQ020 == 2 ~ 1,
         SMQ020 == 1 ~ 2,
         TRUE ~ NA_real_   
-))
-table(data$SMQ020)
+)) %>%
+    filter(!is.na(SMQ020))
+cat("删除了", n - nrow(data), "行吸烟数据缺失数据\n")
 
-# 处理sedentary time
-table(data$PAD680)
-data = data %>%
-    mutate(
-        PAD680 = ifelse(PAD680>=0 & PAD680<=1200, PAD680, NA_real_) 
-)
-table(data$PAD680)
 
 # 处理Diabetes 和 Hypertension
-table(data$DIQ010)
-table(data$BPQ020)
+n = nrow(data)
 data = data %>%
     mutate(
         DIQ010 = case_when(
@@ -136,49 +188,33 @@ data = data %>%
         BPQ020 == 2 ~ 2,
         TRUE ~ NA_real_   
     )
-)
-table(data$DIQ010)
-table(data$BPQ020)
+) 
 
-# 处理重金属数据
-summary(data[, c("LBXBPB", "LBXBCD", "LBXTHG", "LBXBSE", "LBXBMN")])
+# 打印缺失值数量
+cat("Diabetes 缺失值数量:", sum(is.na(data$DIQ010)), "\n")
+cat("Hypertension 缺失值数量:", sum(is.na(data$BPQ020)), "\n")
+
+# 过滤掉缺失值
+data = data %>%
+  filter(!is.na(DIQ010), !is.na(BPQ020))
+
+# 处理sedentary time
+n = nrow(data)
 data = data %>%
     mutate(
-        LBXBPB = ifelse(LBXBPB >= 0.25, LBXBPB, NA_real_),
-        LBXBCD = ifelse(LBXBCD >= 0.16, LBXBCD, NA_real_),
-        LBXTHG = ifelse(LBXTHG >= 0.16, LBXTHG, NA_real_),
-        LBXBSE = ifelse(LBXBSE >= 30, LBXBSE, NA_real_),
-        LBXBMN = ifelse(LBXBMN >= 1.06, LBXBMN, NA_real_)
-    )
-summary(data[, c("LBXBPB", "LBXBCD", "LBXTHG", "LBXBSE", "LBXBMN")])
-
-# 处理骨密度数据
-summary(data[, c("DXDLALE", "DXDRALE", "DXDLLLE", "DXDRLLE")])
-data = data %>%
-    mutate(
-        ASM = (DXDLALE + DXDRALE + DXDLLLE + DXDRLLE) / 1000,
-        ASMI = ASM / BMXBMI,
-        Sarcopenia = ifelse((RIAGENDR == 1 & ASMI < 0.789) | (RIAGENDR == 2 & ASMI < 0.512) , 1, 0)
-    )
+        PAD680 = ifelse(PAD680>=0 & PAD680<=1200, PAD680, NA_real_) 
+) %>%
+    filter(!is.na(PAD680))
+cat("删除了", n - nrow(data), "行sedentary time缺失数据\n")
 
 
-
+# 冗余设计
 data = na.omit(data)
 table(data$Sarcopenia)
+na.summary(data)
 
 # 清楚不需要的变量
 rm(DEMO, PBCD, ALQ, BMX, BPQ, DXX, PAQ, SMQ, DIQ, interst, merged_data)
-
-# 对重金属数据进行单位统一
-data = data %>%
-    mutate(
-        LBXBCD = LBXBCD / 10,
-        LBXTHG = LBXTHG / 10,
-        LBXBSE = LBXBSE / 10,
-        LBXBMN = LBXBMN / 10
-    )
-
-summary(data)
 
 # 保存数据
 write.csv(data, file = "./第二篇/data.csv", row.names = FALSE)
