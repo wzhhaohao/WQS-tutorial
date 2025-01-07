@@ -3,18 +3,7 @@ library(foreign)
 # Read XPT files
 read_xpts = function(path) {
     files = list.files(path, pattern = "\\.xpt$", full.names = TRUE)
-    data.list = lapply(files, function(file) as.data.frame(read.xport(file)))
-
-    # if (reduce) {
-    # common_columns = Reduce(intersect, lapply(data.list, names))
-    # merged_data = do.call(rbind, lapply(data.list, function(df) {
-    #     df[, common_columns, drop = FALSE]
-    # }))
-    #     return(merged_data)
-    # }
-
-    data = bind_rows(data.list)
-
+    data = lapply(files, function(file) as.data.frame(read.xport(file))) %>% bind_rows()
 
     data = data[!duplicated(data$SEQN, fromLast = TRUE), ]
     return(data)
