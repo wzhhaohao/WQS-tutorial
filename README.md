@@ -21,7 +21,7 @@ doi：https://doi.org/10.1016/j.jhazmat.2023.133005
 
 纳入排除流程图：
 
-<img src="/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106135453849.png" alt="纳入排除标准" style="zoom:50%;" />
+<img src="./png//image-20250106135453849.png" alt="纳入排除标准" style="zoom:50%;" />
 
 
 
@@ -45,29 +45,29 @@ Whole-blood specimens were kept at - 30 °C
 
 - [x] whole blood Pb  LBXBPB 0.25 µg/dL
 
-![image-20250106225502316](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106225502316.png)
+![image-20250106225502316](./png//image-20250106225502316.png)
 
 - [x] whole blood Cd  LBXBCD 0.16 µg/L
 
-![image-20250106225517638](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106225517638.png)
+![image-20250106225517638](./png//image-20250106225517638.png)
 
 - [x] whole blood Hg  LBXTHG 0.16 µg/L
 
-![image-20250106225532494](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106225532494.png)
+![image-20250106225532494](./png//image-20250106225532494.png)
 
 - [x] whole blood Se  LBXBSE 30 ug/L
 
-![image-20250106225543601](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106225543601.png)
+![image-20250106225543601](./png//image-20250106225543601.png)
 
 - [x] whole blood Mn  LBXBMN 1.06 ug/L
 
-![image-20250106225555086](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106225555086.png)
+![image-20250106225555086](./png//image-20250106225555086.png)
 
 细节：
 
 - [x] 清洗完数据之后记得统一单位！！！
 
-![image-20250106151854668](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106151854668.png)
+![image-20250106151854668](./png//image-20250106151854668.png)
 
 #### Exclusion criteria：
 
@@ -87,17 +87,17 @@ Whole-blood specimens were kept at - 30 °C
 - [x] **Lower Body Lean Mass**（下肢瘦体重）
 - [x] **BMXBMI**  BMX
 
-![image-20250106230711587](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106230711587.png)
+![image-20250106230711587](./png//image-20250106230711587.png)
 
 
 
-![image-20250106230527984](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106230527984.png)
+![image-20250106230527984](./png//image-20250106230527984.png)
 
-![image-20250106230546432](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106230546432.png)
+![image-20250106230546432](./png//image-20250106230546432.png)
 
-![image-20250106230603590](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106230603590.png)
+![image-20250106230603590](./png//image-20250106230603590.png)
 
-![image-20250106230629353](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106230629353.png)
+![image-20250106230629353](./png//image-20250106230629353.png)
 
 
 
@@ -145,11 +145,11 @@ $$
 
 - [x] 年龄（受访时的年龄）作连续型变量 RIDAGEYR
 
-![image-20250106171120459](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106171120459.png)
+![image-20250106171120459](./png//image-20250106171120459.png)
 
 - [x] 性别  Male/Female  二分类变量 RIAGENDR
 
-![image-20250106171126270](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106171126270.png)
+![image-20250106171126270](./png//image-20250106171126270.png)
 
 - [x] BMI  连续型变量  BMI是用到了两次 一次在协变量 一次在ASMBMI中
 
@@ -159,44 +159,44 @@ $$
 
   - [x] 将1和2变为1 将3变为2 将4和5变成3 对于拒绝回答和不知道的以及缺失的排除
 
-  ![image-20250106171148769](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106171148769.png)
+  ![image-20250106171148769](./png//image-20250106171148769.png)
 - [x] 婚姻状况（Never married/Married/Other）三分类  DMDMARTL
 
   - [x] 1是1 5变2 其他变3 missing的排除
 
-![image-20250106171226027](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106171226027.png)
+![image-20250106171226027](./png//image-20250106171226027.png)
 
 - [x] PIR家庭贫困收入比  连续型变量  INDFMPIR
 
-![image-20250106171054912](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106171054912.png)
+![image-20250106171054912](./png//image-20250106171054912.png)
 
 ##### lifestyle 
 
 - [x] drinking status（Yes/No）"Have you consumed a minimum of 12 alcoholic drinks per year?" ALQ101 and ALQ111 将2作为0 1作为1，其他排除
 
-![image-20250106172514110](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106172514110.png)
+![image-20250106172514110](./png//image-20250106172514110.png)
 
-![image-20250106172649220](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106172649220.png)
+![image-20250106172649220](./png//image-20250106172649220.png)
 
 
 
 - [x] smoking status（Yes/No）based on the criterion of smoking at least 100 cigarettes during a person’s lifetime. SMQ020 1和2对换
 
-![image-20250106174156286](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106174156286.png)
+![image-20250106174156286](./png//image-20250106174156286.png)
 
 - [x] sedentary （min）PAD680 排除其他异常数据
 
-![image-20250106174131407](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106174131407.png)
+![image-20250106174131407](./png//image-20250106174131407.png)
 
 ##### Medicine condition
 
 - [x] Diabetes（Yes/No）DIQ010 1和2对换
 
-![image-20250106174059302](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106174059302.png)
+![image-20250106174059302](./png//image-20250106174059302.png)
 
 - [x] Hypertension（Yes/No）BPQ020 1和2对换
 
-![image-20250106174037645](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250106174037645.png)
+![image-20250106174037645](./png//image-20250106174037645.png)
 
 
 
@@ -210,15 +210,15 @@ BIOPRO 2013-2014的数据暂时无法下载
 
 LBXWBCSI -- White blood cell count (1000 cells/uL) -- CBC_H
 
-![image-20250107140029757](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250107140029757.png)
+![image-20250107140029757](./png//image-20250107140029757.png)
 
 LBDSTBSI -- Total bilirubin (umol/L) -- BIOPRO_H 
 
-![image-20250107135940773](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250107135940773.png)
+![image-20250107135940773](./png//image-20250107135940773.png)
 
 LBXSGTSI -- Gamma glutamyl transferase (U/L) -- BIOPRO_H
 
-![image-20250107135954614](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250107135954614.png)
+![image-20250107135954614](./png//image-20250107135954614.png)
 
 ### Statistical analyses
 
@@ -333,12 +333,12 @@ Kruskal-Wallis chi-squared = 2.7964, df = 1, p-value = 0.09448
 
 ### 原文结果
 
-![image-20250107154119743](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250107154119743.png)
+![image-20250107154119743](./png//image-20250107154119743.png)
 
 
 
-![image-20250107191708390](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250107191708390.png)
+![image-20250107191708390](./png//image-20250107191708390.png)
 
 
 
-![image-20250107205637297](/Users/wangzhehao/Library/Application Support/typora-user-images/image-20250107205637297.png)
+![image-20250107205637297](./png//image-20250107205637297.png)
