@@ -125,8 +125,10 @@ data = data %>%
         LBXBCD = log10(LBXBCD / 10),
         LBXTHG = log10(LBXTHG / 10),
         LBXBSE = log10(LBXBSE / 10),
-        LBXBMN = log10(LBXBMN / 10)
+        LBXBMN = log10(LBXBMN / 10),
+        LBXBPB = log10(LBXBPB)
     )
+    
 
 
 # 处理PIR数据：缺失的排除 INDFMPIR
@@ -217,4 +219,4 @@ na.summary(data)
 rm(DEMO, PBCD, ALQ, BMX, BPQ, DXX, PAQ, SMQ, DIQ, interst, merged_data)
 
 # 保存数据
-write.csv(data, file = "./第二篇/data.csv", row.names = FALSE)
+write.csv(data, file = "./data.csv", row.names = FALSE)
