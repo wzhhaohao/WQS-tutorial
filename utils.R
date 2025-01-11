@@ -16,6 +16,7 @@ read_xpts = function(path) {
                   
 # 数据结构函数（缺失值）
 na.summary = function(data) {
+    cat("============================================================\n")
     cat("nrow:", nrow(data), "\n")
     # 统计缺失值
     for (i in 1:ncol(data)) {
@@ -49,8 +50,8 @@ logis_model = function(exposure, var = NULL, outcome = "Sarcopenia") {
   OR.CI = exp(confint.model)
   
   result = data.frame(
-    OR = round(OR, 2),
-    CI = paste0("(", round(OR.CI[,1], 2), ", ", round(OR.CI[,2], 2), ")"),
+    "OR(CI)" = paste0(round(OR, 2), "(", round(OR.CI[,1], 2), ", ", round(OR.CI[,2], 2), ")"),
+
     p = round(summary(model)$coefficients[,4], 3))
 
   return(result)
@@ -69,10 +70,15 @@ ptrend = function(temp_data = df, exposure, var = NULL, outcome = "Sarcopenia") 
   }
   
   model = glm(model_formula, data = temp_data, family = binomial)
+  OR = exp(summary(model)$coefficients[exposure, "Estimate"])
+  confint.model = confint(model)
+  OR.CI = exp(confint.model)[2,]
   p_value = summary(model)$coefficients[exposure, "Pr(>|z|)"]
+
   
   result = data.frame(
     metals = exposure,
+    "OR(CI)" = paste0(round(OR, 2), "(", round(OR.CI[1], 2), ", ", round(OR.CI[2], 2), ")"),
     p_value = ifelse(p_value < 0.001, "<0.001", round(p_value, 3)))
   return(result)
 }
