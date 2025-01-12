@@ -2,6 +2,8 @@
 # 文件名：utils.R
 # 加载必要的包
 library(foreign)
+library(dplyr)
+library(broom)
 
 # 批量读取函数
 read_xpts = function(path) { 
@@ -31,54 +33,103 @@ na.summary = function(data) {
 }
 
 # 快速逻辑回归建模函数
-logis_model = function(exposure, var = NULL, outcome = "Sarcopenia") {
-  if(length(exposure) > 1) {
-    exposure = paste(exposure, collapse = " + ")
-  }
-
-  if (!is.null(var)) {
-    var_formula = paste(var, collapse = " + ")
-    model_formula = as.formula(paste(outcome, "~", exposure, "+", var_formula))
-  } else {
-    model_formula = as.formula(paste(outcome, "~", exposure))
-  }
-
-  model = glm(model_formula, data = df, family = binomial)
-  coef = coefficients(model)
-  OR = exp(coef)
-  confint.model = confint(model)
-  OR.CI = exp(confint.model)
+logis_model = function(data = df, exposure, variable = NULL, outcome = "Sarcopenia") {
   
-  result = data.frame(
-    "OR(CI)" = paste0(round(OR, 2), "(", round(OR.CI[,1], 2), ", ", round(OR.CI[,2], 2), ")"),
+  # 辅助函数：给定公式，返回模型及结果
+  run_glm_and_extract = function(formula, data, type) {
+    model = glm(formula, data = data, family = binomial)
+    tidy_model <- broom::tidy(model, conf.int = TRUE, exponentiate = TRUE)
+    
+    exposure_pattern = ifelse(type == "linear", paste0("^", exposure, collapse = "|"), paste0("^", toupper(exposure), collapse = "|"))
+    sub_tidy <- tidy_model %>%
+      filter(grepl(exposure_pattern, term))
+    
+    result <- as.data.frame(sub_tidy) %>%
+      mutate(
+        metal = term,
+        "OR(95%CI)" = sprintf("%.2f (%.2f, %.2f)", estimate, conf.low, conf.high),
+        p_value = ifelse(p.value < 0.001, "<0.001", sprintf("%.3f", p.value))
+      ) %>%
+      dplyr::select(metal, "OR(95%CI)", p_value)
+  }
+  
+  exposure_linear = paste(exposure, collapse = " + ")
+  if (!is.null(variable)) {
+    variable_formula = paste(variable, collapse = " + ")
+    formula_linear = as.formula(paste(outcome, "~", exposure_linear, "+", variable_formula))
+  } else {
+    formula_linear = as.formula(paste(outcome, "~", exposure_linear))
+  }
+  
+  result_linear = run_glm_and_extract(formula_linear, data, type = "linear")
 
-    p = round(summary(model)$coefficients[,4], 3))
-
-  return(result)
+  # 分位数分析：将 exposure 划分为 Q1~Q4
+  E = toupper(exposure)
+  E_quantile = paste(E, collapse = " + ")
+  for (exp in exposure) {
+    new_col_name =  toupper(exp)
+    
+    data[[new_col_name]] = cut(
+      data[[exp]],
+      breaks = quantile(data[[exp]], probs = seq(0, 1, 0.25), na.rm = TRUE),
+      include.lowest = TRUE,
+      labels = paste0("Q", 1:4)
+    )
+  }
+  if (!is.null(variable)) {
+    formula_grouped = as.formula(paste(outcome, "~", E_quantile, "+", variable_formula))
+  } else {
+    formula_grouped = as.formula(paste(outcome,  "~", E_quantile))
+  }
+  
+  result_grouped = run_glm_and_extract(formula_grouped, data, "Q")
+  
+  return(list(Linear_Analysis = result_linear, Grouped_Analysis = result_grouped))
 }
                                                 
 # 趋势分析函数
-ptrend = function(temp_data = df, exposure, var = NULL, outcome = "Sarcopenia") {
-  temp_data[exposure] = lapply(temp_data[exposure], as.numeric)
-  exposure_formula = paste(exposure, collapse = " + ")
+ptrend <- function(data, exposure, variables = NULL, outcome = "Sarcopenia", Q = 4) {
+  # 使用 dplyr::across 创建分位数分箱后的变量
+  data <- data %>%
+    mutate(across(
+      all_of(exposure),
+      ~ as.numeric(cut(
+        .x,
+        breaks = quantile(.x, probs = seq(0, 1, length.out = Q + 1), na.rm = TRUE),
+        include.lowest = TRUE,
+        labels = 1:Q,
+        right = TRUE
+      )),
+      .names = "{toupper(.col)}"  # 新变量名为大写的暴露变量名
+    ))
   
-  if (!is.null(var)) {
-    var_formula = paste(var, collapse = " + ")
-    model_formula = as.formula(paste(outcome, "~", exposure_formula, "+", var_formula))
+  # 构建回归公式
+  E_quantile <- paste(toupper(exposure), collapse = " + ")
+  
+  if (!is.null(variables)) {
+    variables <- as.character(variables)
+    formula_terms <- paste(c(E_quantile, paste(variables, collapse = " + ")), collapse = " + ")
   } else {
-    model_formula = as.formula(paste(outcome, "~", exposure_formula))
+    formula_terms <- E_quantile
   }
   
-  model = glm(model_formula, data = temp_data, family = binomial)
-  OR = exp(summary(model)$coefficients[exposure, "Estimate"])
-  confint.model = confint(model)
-  OR.CI = exp(confint.model)[2,]
-  p_value = summary(model)$coefficients[exposure, "Pr(>|z|)"]
-
+  model_formula <- as.formula(paste(outcome, "~", formula_terms))
+  model <- glm(model_formula, data = data, family = binomial)
+  tidy_model <- broom::tidy(model, conf.int = TRUE, exponentiate = TRUE)
   
-  result = data.frame(
-    metals = exposure,
-    "OR(CI)" = paste0(round(OR, 2), "(", round(OR.CI[1], 2), ", ", round(OR.CI[2], 2), ")"),
-    p_value = ifelse(p_value < 0.001, "<0.001", round(p_value, 3)))
+  exposure_pattern <- paste0("^", toupper(exposure), collapse = "|")
+  
+  # 使用正则表达式筛选相关的系数
+  sub_tidy <- tidy_model %>%
+    filter(grepl(exposure_pattern, term))
+  
+  result <- as.data.frame(sub_tidy) %>%
+    mutate(
+      metal = term,
+      `OR(95%CI)` = sprintf("%.2f (%.2f, %.2f)", estimate, conf.low, conf.high),
+      p_value = ifelse(p.value < 0.001, "<0.001", sprintf("%.3f", p.value))
+    ) %>%
+    dplyr::select(metal, `OR(95%CI)`, p_value)
+  
   return(result)
 }
