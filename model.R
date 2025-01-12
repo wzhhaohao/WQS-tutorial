@@ -1,4 +1,6 @@
-# import packages
+#R_prog_24.4 - R_prog_24.11
+# 文件名：model.R
+# 载入包
 library(tableone)
 library(splines)
 library(dplyr)
@@ -112,7 +114,6 @@ model2_ptrend = ptrend(df, exposure = metals, variable = vars)
 
 # WQS model
 # crude WQS model
-start_time = Sys.time()
 crude_wqs_model_pos = gwqs(
   formula = Sarcopenia ~ wqs, 
   data = df,
@@ -120,27 +121,13 @@ crude_wqs_model_pos = gwqs(
   b = 10000, 
   q = 4, 
   validation = 0.6,
-  b1_pos = TRUE,      # 正向 WQS 指数
+  b1_pos = TRUE,      # 正向 WQS 指数 负向改为FALSE
   b_constr = FALSE,
   family = "binomial",
   seed = 1,
   plots = TRUE,
   tables = TRUE
 )
-
-crude_coef = coefficients(crude_wqs_model_pos)
-crude_OR = exp(crude_coef)
-confint.model = confint(crude_wqs_model_pos)
-crude_OR.CI = exp(confint.model)
-
-crude_result = data.frame(
-  crude_OR = round(crude_OR, 2),
-  crude_CI = paste0("(", round(crude_OR.CI[,1], 2), ", ", round(crude_OR.CI[,2], 2), ")"),
-  crude_p = round(summary(crude_wqs_model_pos)$coefficients[,4], 3))
-print(crude_result)
-
-end_time = Sys.time()
-print(end_time - start_time)
 ###################################################################################
 # 调整后的模型
 # 正向 WQS 模型
@@ -192,7 +179,6 @@ wqs_model_neg = gwqs(
   plots = TRUE,
   tables = TRUE
 )
-summary(wqs_model_neg)
 
 # 调整过的正向权重 画图
 w_ord = order(wqs_model_pos$final_weights$mean_weight)

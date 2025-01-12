@@ -38,13 +38,13 @@ logis_model = function(data = df, exposure, variable = NULL, outcome = "Sarcopen
   # 辅助函数：给定公式，返回模型及结果
   run_glm_and_extract = function(formula, data, type) {
     model = glm(formula, data = data, family = binomial)
-    tidy_model <- broom::tidy(model, conf.int = TRUE, exponentiate = TRUE)
+    tidy_model = broom::tidy(model, conf.int = TRUE, exponentiate = TRUE)
     
     exposure_pattern = ifelse(type == "linear", paste0("^", exposure, collapse = "|"), paste0("^", toupper(exposure), collapse = "|"))
-    sub_tidy <- tidy_model %>%
+    sub_tidy = tidy_model %>%
       filter(grepl(exposure_pattern, term))
     
-    result <- as.data.frame(sub_tidy) %>%
+    result = as.data.frame(sub_tidy) %>%
       mutate(
         metal = term,
         "OR(95%CI)" = sprintf("%.2f (%.2f, %.2f)", estimate, conf.low, conf.high),
@@ -88,9 +88,9 @@ logis_model = function(data = df, exposure, variable = NULL, outcome = "Sarcopen
 }
                                                 
 # 趋势分析函数
-ptrend <- function(data, exposure, variables = NULL, outcome = "Sarcopenia", Q = 4) {
+ptrend = function(data, exposure, variables = NULL, outcome = "Sarcopenia", Q = 4) {
   # 使用 dplyr::across 创建分位数分箱后的变量
-  data <- data %>%
+  data = data %>%
     mutate(across(
       all_of(exposure),
       ~ as.numeric(cut(
@@ -104,26 +104,26 @@ ptrend <- function(data, exposure, variables = NULL, outcome = "Sarcopenia", Q =
     ))
   
   # 构建回归公式
-  E_quantile <- paste(toupper(exposure), collapse = " + ")
+  E_quantile = paste(toupper(exposure), collapse = " + ")
   
   if (!is.null(variables)) {
-    variables <- as.character(variables)
-    formula_terms <- paste(c(E_quantile, paste(variables, collapse = " + ")), collapse = " + ")
+    variables = as.character(variables)
+    formula_terms = paste(c(E_quantile, paste(variables, collapse = " + ")), collapse = " + ")
   } else {
-    formula_terms <- E_quantile
+    formula_terms = E_quantile
   }
   
-  model_formula <- as.formula(paste(outcome, "~", formula_terms))
-  model <- glm(model_formula, data = data, family = binomial)
-  tidy_model <- broom::tidy(model, conf.int = TRUE, exponentiate = TRUE)
+  model_formula = as.formula(paste(outcome, "~", formula_terms))
+  model = glm(model_formula, data = data, family = binomial)
+  tidy_model = broom::tidy(model, conf.int = TRUE, exponentiate = TRUE)
   
-  exposure_pattern <- paste0("^", toupper(exposure), collapse = "|")
+  exposure_pattern = paste0("^", toupper(exposure), collapse = "|")
   
   # 使用正则表达式筛选相关的系数
-  sub_tidy <- tidy_model %>%
+  sub_tidy = tidy_model %>%
     filter(grepl(exposure_pattern, term))
   
-  result <- as.data.frame(sub_tidy) %>%
+  result = as.data.frame(sub_tidy) %>%
     mutate(
       metal = term,
       `OR(95%CI)` = sprintf("%.2f (%.2f, %.2f)", estimate, conf.low, conf.high),
